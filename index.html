@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>PQC-JWT Framework · SLIIT Research 25-26J-048</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+/* ── TOKENS ─────────────────────────────────── */
+:root {
+  --bg:        #FAFAFA;
+  --surface:   #FFFFFF;
+  --ink:       #0D1117;
+  --ink2:      #24292F;
+  --muted:     #57606A;
+  --subtle:    #8C959F;
+  --border:    #E8EAED;
+  --border2:   #D0D7DE;
+  --accent:    #0969DA;
+  --accent-bg: #DDF4FF;
+  --accent2:   #1A7F37;
+  --accent2-bg:#DCFFE4;
+  --red:       #CF222E;
+  --red-bg:    #FFEBE9;
+  --purple:    #8250DF;
+  --purple-bg: #FBEFFF;
+  --hero-bg:   #0D1117;
+  --hero-ink:  #E6EDF3;
+  --hero-muted:#8B949E;
+  --mono:      'JetBrains Mono', monospace;
+  --sans:      'Plus Jakarta Sans', sans-serif;
+  --radius:    10px;
+  --shadow:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+}
+
+/* ── BASE ────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink2);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+a { text-decoration: none; color: inherit; }
+img { max-width: 100%; display: block; }
+
+/* ── LAYOUT ──────────────────────────────────── */
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 32px; }
+.wrap-narrow { max-width: 720px; margin: 0 auto; padding: 0 32px; }
+
+/* ── NAV ─────────────────────────────────────── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 99;
+  height: 56px;
+  display: flex; align-items: center;
+  background: rgba(13,17,23,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.nav-inner {
+  width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 32px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 10px;
+}
+.nav-brand-mark {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: linear-gradient(135deg, #0969DA, #0550AE);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  color: #fff; letter-spacing: -.5px;
+}
+.nav-brand-text {
+  font-family: var(--mono); font-size: 13px; font-weight: 500;
+  color: rgba(230,237,243,.8); letter-spacing: .3px;
+}
+.nav-links {
+  display: flex; align-items: center; gap: 4px;
+}
+.nav-links a {
+  font-size: 13px; font-weight: 500; color: var(--hero-muted);
+  padding: 6px 12px; border-radius: 6px;
+  transition: color .15s, background .15s;
+}
+.nav-links a:hover { color: var(--hero-ink); background: rgba(255,255,255,.06); }
+.nav-chip {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  color: #58A6FF; border: 1px solid rgba(88,166,255,.3);
+  padding: 4px 10px; border-radius: 20px; margin-left: 8px;
+  letter-spacing: .3px;
+}
+
+/* ── HERO ────────────────────────────────────── */
+.hero {
+  background: var(--hero-bg);
+  min-height: 100vh; display: flex; align-items: center;
+  position: relative; overflow: hidden;
+}
+.hero-noise {
+  position: absolute; inset: 0; opacity: .025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px;
+}
+.hero-grad {
+  position: absolute; pointer-events: none;
+  top: -30%; right: -10%; width: 600px; height: 600px;
+  background: radial-gradient(circle at center, rgba(9,105,218,.18) 0%, transparent 65%);
+}
+.hero-grad2 {
+  position: absolute; pointer-events: none;
+  bottom: -20%; left: -5%; width: 400px; height: 400px;
+  background: radial-gradient(circle at center, rgba(26,127,55,.1) 0%, transparent 65%);
+}
+.hero-inner {
+  position: relative; z-index: 2;
+  width: 100%; max-width: 1080px; margin: 0 auto;
+  padding: 120px 32px 80px;
+}
+.hero-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 12px; font-weight: 500;
+  color: #58A6FF; margin-bottom: 28px; letter-spacing: .5px;
+}
+.hero-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #3FB950;
+  box-shadow: 0 0 8px rgba(63,185,80,.6);
+  animation: blink 2.5s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+.hero-title {
+  font-size: clamp(32px, 4.5vw, 58px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+  color: var(--hero-ink);
+  max-width: 700px;
+  margin-bottom: 20px;
+}
+.hero-title .hl {
+  background: linear-gradient(135deg, #58A6FF 0%, #3FB950 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-desc {
+  font-size: 16px; font-weight: 300; color: var(--hero-muted);
+  max-width: 520px; line-height: 1.7; margin-bottom: 40px;
+}
+.hero-pills {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px;
+}
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  padding: 5px 11px; border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(230,237,243,.6); letter-spacing: .3px;
+}
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--sans); font-size: 14px; font-weight: 600;
+  padding: 10px 22px; border-radius: var(--radius);
+  transition: all .18s; cursor: pointer;
+}
+.btn-primary {
+  background: #0969DA; color: #fff; border: 1px solid #0969DA;
+}
+.btn-primary:hover { background: #0550AE; border-color: #0550AE; }
+.btn-secondary {
+  background: rgba(255,255,255,.05); color: rgba(230,237,243,.85);
+  border: 1px solid rgba(255,255,255,.12);
+}
+.btn-secondary:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.22); }
+
+/* ── DIVIDER ─────────────────────────────────── */
+.divider { height: 1px; background: var(--border); }
+
+/* ── SECTION HEADER ──────────────────────────── */
+.sec-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.sec-label::before { content: ''; width: 20px; height: 1px; background: var(--accent); }
+.sec-title {
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 700; letter-spacing: -0.8px; line-height: 1.15;
+  color: var(--ink); margin-bottom: 12px;
+}
+.sec-sub {
+  font-size: 15px; color: var(--muted); font-weight: 400;
+  line-height: 1.65; max-width: 540px;
+}
+
+/* ── SECTION SPACING ─────────────────────────── */
+.section { padding: 88px 0; }
+.section-alt { background: var(--surface); }
+.section-dark { background: var(--hero-bg); }
+
+/* ── ABSTRACT ────────────────────────────────── */
+.abstract-grid {
+  display: grid; grid-template-columns: 1fr 380px; gap: 64px;
+  align-items: start; margin-top: 52px;
+}
+.abstract-body {
+  font-size: 15px; line-height: 1.8; color: #444C56; font-weight: 400;
+}
+.abstract-body p + p { margin-top: 18px; }
+.abstract-body strong { color: var(--ink2); font-weight: 600; }
+.stats-stack { display: flex; flex-direction: column; gap: 12px; }
+.stat {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 22px;
+  display: flex; align-items: center; gap: 18px;
+  transition: box-shadow .2s;
+}
+.stat:hover { box-shadow: var(--shadow-md); }
+.stat-val {
+  font-family: var(--mono); font-size: 26px; font-weight: 700;
+  color: var(--ink); letter-spacing: -1px; flex-shrink: 0; min-width: 72px;
+}
+.stat-info {}
+.stat-unit { font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 500; letter-spacing: .3px; }
+.stat-desc { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+/* ── RESULTS ─────────────────────────────────── */
+.results-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  margin-top: 52px;
+}
+.result-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.result-card:hover { border-color: var(--border2); box-shadow: var(--shadow-md); }
+.result-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  padding: 3px 8px; border-radius: 4px; margin-bottom: 14px;
+  letter-spacing: .3px; text-transform: uppercase;
+}
+.tag-blue  { background: var(--accent-bg);  color: var(--accent); }
+.tag-green { background: var(--accent2-bg); color: var(--accent2); }
+.tag-red   { background: var(--red-bg);     color: var(--red); }
+.tag-purple{ background: var(--purple-bg);  color: var(--purple); }
+.result-card h3 {
+  font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 8px;
+  letter-spacing: -.2px;
+}
+.result-card p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+.result-metric {
+  display: flex; align-items: baseline; gap: 5px; margin-top: 14px;
+  padding-top: 14px; border-top: 1px solid var(--border);
+}
+.result-metric-val {
+  font-family: var(--mono); font-size: 20px; font-weight: 700;
+  color: var(--ink); letter-spacing: -0.5px;
+}
+.result-metric-label { font-size: 12px; color: var(--muted); }
+
+/* ── TEAM ────────────────────────────────────── */
+.team-section { background: var(--surface); }
+.team-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  margin-top: 52px;
+}
+.team-card {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 22px; background: var(--bg);
+  transition: border-color .2s, box-shadow .2s;
+}
+.team-card:hover { border-color: var(--border2); box-shadow: var(--shadow-md); }
+.team-card.sup { background: var(--surface); border-color: rgba(9,105,218,.2); }
+.team-avatar {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  color: #fff; margin-bottom: 14px; flex-shrink: 0;
+}
+.av-blue    { background: linear-gradient(135deg,#0969DA,#0550AE); }
+.av-slate   { background: linear-gradient(135deg,#444C56,#24292F); }
+.av-teal    { background: linear-gradient(135deg,#0969DA,#1A7F37); }
+.av-purple  { background: linear-gradient(135deg,#8250DF,#0969DA); }
+.av-green   { background: linear-gradient(135deg,#1A7F37,#0969DA); }
+.av-pink    { background: linear-gradient(135deg,#CF222E,#8250DF); }
+.team-role {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  color: var(--accent); letter-spacing: .5px; text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.team-name { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.team-id   { font-family: var(--mono); font-size: 11px; color: var(--subtle); margin-bottom: 10px; }
+.team-email { font-size: 12px; color: var(--muted); }
+.team-email:hover { color: var(--accent); }
+.sup-badge {
+  display: inline-flex; align-items: center;
+  font-family: var(--mono); font-size: 10px; color: var(--accent);
+  background: var(--accent-bg); padding: 2px 7px; border-radius: 4px;
+  margin-bottom: 14px; letter-spacing: .3px;
+}
+
+/* ── TIMELINE ────────────────────────────────── */
+.timeline { position: relative; margin-top: 52px; }
+.tl-line {
+  position: absolute; left: 0; top: 8px; bottom: 8px; width: 2px;
+  background: linear-gradient(to bottom, var(--accent), var(--border));
+}
+.tl-items { padding-left: 28px; display: flex; flex-direction: column; gap: 0; }
+.tl-item {
+  position: relative; padding: 0 0 36px 0;
+}
+.tl-item:last-child { padding-bottom: 0; }
+.tl-dot {
+  position: absolute; left: -34px; top: 5px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--surface); border: 2.5px solid var(--border2);
+  z-index: 1;
+}
+.tl-item.done .tl-dot { background: var(--accent); border-color: var(--accent); }
+.tl-item.current .tl-dot {
+  background: #3FB950; border-color: #3FB950;
+  box-shadow: 0 0 0 4px rgba(63,185,80,.15);
+}
+.tl-date { font-family: var(--mono); font-size: 11px; color: var(--subtle); margin-bottom: 4px; letter-spacing: .3px; }
+.tl-title { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.tl-desc { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 560px; }
+.tl-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  padding: 2px 8px; border-radius: 4px; margin-top: 8px;
+  letter-spacing: .3px;
+}
+
+/* ── DOCUMENTS ───────────────────────────────── */
+.docs-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+  margin-top: 52px;
+}
+.doc-row {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 18px;
+  transition: border-color .2s, box-shadow .2s; cursor: pointer;
+}
+.doc-row:hover { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(9,105,218,.07); }
+.doc-icon {
+  width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.doc-icon.pdf    { background: #FFEBE9; }
+.doc-icon.code   { background: var(--accent-bg); }
+.doc-icon.slides { background: #FFF8C5; }
+.doc-icon.link   { background: var(--accent2-bg); }
+.doc-info { flex: 1; min-width: 0; }
+.doc-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+.doc-meta { font-family: var(--mono); font-size: 11px; color: var(--subtle); margin-top: 1px; }
+.doc-status {
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  padding: 3px 8px; border-radius: 4px; flex-shrink: 0;
+}
+.status-soon   { background: #FFF8C5; color: #9A6700; }
+.status-ready  { background: var(--accent2-bg); color: var(--accent2); }
+.status-link   { background: var(--accent-bg); color: var(--accent); }
+
+/* ── TECH ────────────────────────────────────── */
+.tech-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  margin-top: 52px;
+}
+.tech-card {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--radius); padding: 18px 20px;
+  transition: background .2s, border-color .2s;
+}
+.tech-card:hover { background: rgba(255,255,255,.07); border-color: rgba(88,166,255,.3); }
+.tech-card-name {
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  color: #E6EDF3; margin-bottom: 4px;
+}
+.tech-card-desc { font-size: 12px; color: #8B949E; line-height: 1.5; }
+
+/* ── DOMAIN ──────────────────────────────────── */
+.domain-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  margin-top: 52px;
+}
+.domain-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.domain-card:hover { border-color: var(--border2); box-shadow: var(--shadow-md); }
+.domain-num {
+  font-family: var(--mono); font-size: 10px; color: var(--subtle);
+  letter-spacing: 1px; margin-bottom: 12px;
+}
+.domain-card h3 { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+.domain-card p  { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+/* ── FOOTER ──────────────────────────────────── */
+.footer {
+  background: var(--hero-bg); border-top: 1px solid rgba(255,255,255,.06);
+  padding: 48px 0;
+}
+.footer-inner {
+  max-width: 1080px; margin: 0 auto; padding: 0 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+}
+.footer-left {}
+.footer-brand {
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  color: var(--hero-ink); margin-bottom: 6px;
+}
+.footer-meta { font-size: 13px; color: #8B949E; line-height: 1.5; }
+.footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+.footer-links a {
+  font-size: 13px; color: #8B949E; transition: color .15s;
+}
+.footer-links a:hover { color: var(--hero-ink); }
+
+/* ── REVEAL ──────────────────────────────────── */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ── RESPONSIVE ──────────────────────────────── */
+@media (max-width: 900px) {
+  .abstract-grid { grid-template-columns: 1fr; gap: 40px; }
+  .results-grid  { grid-template-columns: repeat(2, 1fr); }
+  .team-grid     { grid-template-columns: repeat(2, 1fr); }
+  .tech-grid     { grid-template-columns: repeat(2, 1fr); }
+  .domain-grid   { grid-template-columns: repeat(2, 1fr); }
+  .docs-grid     { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .wrap, .wrap-narrow { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hero-inner { padding: 100px 20px 60px; }
+  .results-grid { grid-template-columns: 1fr; }
+  .team-grid    { grid-template-columns: 1fr; }
+  .tech-grid    { grid-template-columns: repeat(2, 1fr); }
+  .domain-grid  { grid-template-columns: 1fr; }
+  .footer-inner { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <div class="nav-brand-mark">PQ</div>
+      <div class="nav-brand-text">pqc-jwt-framework</div>
+    </div>
+    <div class="nav-links">
+      <a href="#abstract">Abstract</a>
+      <a href="#results">Results</a>
+      <a href="#team">Team</a>
+      <a href="#milestones">Milestones</a>
+      <a href="#documents">Documents</a>
+      <a href="#domain">Domain</a>
+    </div>
+    <div class="nav-chip">25-26J-048</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-noise"></div>
+  <div class="hero-grad"></div>
+  <div class="hero-grad2"></div>
+  <div class="hero-inner">
+    <div class="hero-label">
+      <div class="hero-dot"></div>
+      SLIIT Research &nbsp;·&nbsp; Information Assurance &amp; Security &nbsp;·&nbsp; 2025/2026
+    </div>
+    <h1 class="hero-title">
+      Secure Enhanced <span class="hl">JWT Framework</span><br/>
+      with Post-Quantum Cryptography
+    </h1>
+    <p class="hero-desc">
+      A production-oriented ML-DSA-44 signing and verification architecture for
+      quantum-resistant distributed authentication, built on NIST FIPS 204.
+    </p>
+    <div class="hero-pills">
+      <div class="pill">ML-DSA-44</div>
+      <div class="pill">NIST FIPS 204</div>
+      <div class="pill">FastAPI</div>
+      <div class="pill">JOSE / JWS</div>
+      <div class="pill">CRYSTALS-Dilithium</div>
+      <div class="pill">Docker</div>
+    </div>
+    <div class="hero-actions">
+      <a href="#" class="btn btn-primary">View Paper &nbsp;<span style="opacity:.55;font-size:12px">Coming Soon</span></a>
+      <a href="https://github.com/Cyber-Research-Quitty/Quitty" target="_blank" class="btn btn-secondary">GitHub Repo ↗</a>
+    </div>
+  </div>
+</header>
+
+<!-- ABSTRACT -->
+<section id="abstract" class="section">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-label">Abstract</div>
+      <h2 class="sec-title">Quantum-Resistant Authentication</h2>
+      <p class="sec-sub">Replacing classical JWT signing algorithms with a lattice-based post-quantum alternative across a four-component microservice architecture.</p>
+    </div>
+    <div class="abstract-grid reveal">
+      <div class="abstract-body">
+        <p>
+          JSON Web Tokens are the de facto standard for stateless authentication in distributed systems.
+          The classical signing algorithms they rely upon — RSA and ECDSA — are mathematically vulnerable
+          to quantum computing attacks via Shor's algorithm, threatening the security of virtually all
+          modern web authentication infrastructure.
+        </p>
+        <p>
+          This research designs, implements, and evaluates a <strong>Post-Quantum JWT Signing and Verification
+          Service (P1)</strong> using ML-DSA-44 (CRYSTALS-Dilithium), standardised in NIST FIPS 204. The service
+          preserves full JOSE compatibility — RFC 7515 JWS serialisation, kid-based key discovery,
+          structured error taxonomy — while replacing the signing primitive with a lattice-based algorithm
+          resistant to quantum attacks.
+        </p>
+        <p>
+          The framework is deployed as four tightly integrated microservices: P1 (signing), P2 (JWKS &amp;
+          transparency), P3 (guard &amp; policy middleware), and P4 (revocation). Evaluation confirms
+          post-quantum JWT authentication is operationally viable with competitive latency and zero
+          request failures under realistic load.
+        </p>
+      </div>
+      <div class="stats-stack">
+        <div class="stat">
+          <div class="stat-val">67.2</div>
+          <div class="stat-info">
+            <div class="stat-unit">ms avg latency</div>
+            <div class="stat-desc">Overall system · 200 requests · 5 VUs</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">0</div>
+          <div class="stat-info">
+            <div class="stat-unit">failures</div>
+            <div class="stat-desc">200 benchmark requests · 100% checks passed</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">71.9</div>
+          <div class="stat-info">
+            <div class="stat-unit">req/s throughput</div>
+            <div class="stat-desc">Sustained under realistic benchmark load</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-val">&lt;0.4</div>
+          <div class="stat-info">
+            <div class="stat-unit">ms sign time</div>
+            <div class="stat-desc">ML-DSA-44 cryptographic signing operation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- RESULTS -->
+<section id="results" class="section section-alt">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-label">Results</div>
+      <h2 class="sec-title">Key Research Findings</h2>
+      <p class="sec-sub">Benchmarked against an RS256 classical baseline across latency, token size, stability, and key management.</p>
+    </div>
+    <div class="results-grid reveal">
+      <div class="result-card">
+        <div class="result-tag tag-blue">Latency</div>
+        <h3>Competitive Tail Latency</h3>
+        <p>PQC p95 login (102.5 ms) and p99 (115.8 ms) are both lower than RS256 baseline p95 (117.4 ms) and p99 (206.0 ms). The algorithm is not the bottleneck.</p>
+        <div class="result-metric">
+          <div class="result-metric-val">↓12%</div>
+          <div class="result-metric-label">lower p95 vs RS256</div>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="result-tag tag-green">Crypto Speed</div>
+        <h3>Sub-Millisecond Operations</h3>
+        <p>ML-DSA-44 signing completes in 0.148–0.367 ms and verification in 0.008–0.095 ms. The cryptographic overhead is negligible relative to network latency.</p>
+        <div class="result-metric">
+          <div class="result-metric-val">0.37ms</div>
+          <div class="result-metric-label">maximum sign time</div>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="result-tag tag-red">Token Size</div>
+        <h3>Larger Token Footprint</h3>
+        <p>ML-DSA-44 tokens measure 3,551 bytes versus 519 bytes for RS256. The 6.84× increase is inherent to the 2,420-byte lattice-based signature (FIPS 204).</p>
+        <div class="result-metric">
+          <div class="result-metric-val">3,551 B</div>
+          <div class="result-metric-label">vs 519 B RS256</div>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="result-tag tag-purple">Security</div>
+        <h3>Zero False Accepts</h3>
+        <p>21/21 adversarial cases passed — including alg:none attacks, tampered payloads, algorithm confusion, revoked tokens, and malformed segments.</p>
+        <div class="result-metric">
+          <div class="result-metric-val">0%</div>
+          <div class="result-metric-label">false-accept rate</div>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="result-tag tag-green">Integration</div>
+        <h3>Full System Validation</h3>
+        <p>Integration sweep v3: 9/9 P1 checks passed in production configuration. Multi-active key rotation validated with deterministic SHA-256 key identifiers.</p>
+        <div class="result-metric">
+          <div class="result-metric-val">9/9</div>
+          <div class="result-metric-label">integration checks</div>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="result-tag tag-blue">Stability</div>
+        <h3>Production-Grade Stability</h3>
+        <p>Zero failures across all 200 benchmark requests. Consistent 71.9 req/s throughput. All 100% assertion checks passed across the full benchmark run.</p>
+        <div class="result-metric">
+          <div class="result-metric-val">100%</div>
+          <div class="result-metric-label">assertion pass rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TEAM -->
+<section id="team" class="section">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-label">Team</div>
+      <h2 class="sec-title">Research Group</h2>
+      <p class="sec-sub">Four undergraduate researchers and two faculty supervisors from SLIIT's Cyber Security programme.</p>
+    </div>
+    <div class="team-grid reveal">
+      <div class="team-card sup">
+        <div class="sup-badge">Supervisor</div>
+        <div class="team-avatar av-blue">KY</div>
+        <div class="team-role">Project Supervisor</div>
+        <div class="team-name">Mr. Kavinga Yapa Abeywardena</div>
+        <div class="team-id">SLIIT Faculty · Cyber Security</div>
+        <a href="mailto:kavinga.y@sliit.lk" class="team-email">kavinga.y@sliit.lk</a>
+      </div>
+      <div class="team-card sup">
+        <div class="sup-badge">Co-Supervisor</div>
+        <div class="team-avatar av-slate">AS</div>
+        <div class="team-role">Co-Supervisor</div>
+        <div class="team-name">Mr. Amila Senerath</div>
+        <div class="team-id">SLIIT Faculty</div>
+        <a href="mailto:amila.s@sliit.lk" class="team-email">amila.s@sliit.lk</a>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar av-teal">P1</div>
+        <div class="team-role">Signing &amp; Verification · P1</div>
+        <div class="team-name">Ariyawimala W.A.A.S</div>
+        <div class="team-id">IT22027856</div>
+        <a href="mailto:it22027856@my.sliit.lk" class="team-email">it22027856@my.sliit.lk</a>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar av-purple">P2</div>
+        <div class="team-role">JWKS &amp; Transparency · P2</div>
+        <div class="team-name">Rasiru K.K.G.M</div>
+        <div class="team-id">IT22192332</div>
+        <a href="mailto:it22192332@my.sliit.lk" class="team-email">it22192332@my.sliit.lk</a>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar av-green">P3</div>
+        <div class="team-role">Guard &amp; Policy Middleware · P3</div>
+        <div class="team-name">Ransika A.A.P.W.R.Y</div>
+        <div class="team-id">IT22026934</div>
+        <a href="mailto:it22026934@my.sliit.lk" class="team-email">it22026934@my.sliit.lk</a>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar av-pink">P4</div>
+        <div class="team-role">Revocation Service · P4</div>
+        <div class="team-name">Gunawardane M.H.M.A.S</div>
+        <div class="team-id">IT22170170</div>
+        <a href="mailto:it22170170@my.sliit.lk" class="team-email">it22170170@my.sliit.lk</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- MILESTONES -->
+<section id="milestones" class="section section-alt">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-label">Timeline</div>
+      <h2 class="sec-title">Project Milestones</h2>
+      <p class="sec-sub">Key deliverables and progress checkpoints across the 2025/2026 academic year.</p>
+    </div>
+    <div class="timeline reveal">
+      <div class="tl-line"></div>
+      <div class="tl-items">
+        <div class="tl-item done">
+          <div class="tl-dot"></div>
+          <div class="tl-date">Feb 2025</div>
+          <div class="tl-title">TAF Registration &amp; Group Formation</div>
+          <div class="tl-desc">Project registered as 25-26J-048 under the Information Assurance and Security research group at SLIIT.</div>
+          <div class="tl-badge tag-green">✓ Completed</div>
+        </div>
+        <div class="tl-item done">
+          <div class="tl-dot"></div>
+          <div class="tl-date">Feb 2025</div>
+          <div class="tl-title">Project Proposal Submission</div>
+          <div class="tl-desc">Individual and group proposals submitted, reviewed, and approved. Research scope defined across all four components.</div>
+          <div class="tl-badge tag-green">✓ Completed</div>
+        </div>
+        <div class="tl-item done">
+          <div class="tl-dot"></div>
+          <div class="tl-date">Mar – Apr 2025</div>
+          <div class="tl-title">System Design &amp; Architecture</div>
+          <div class="tl-desc">Four-component microservice architecture designed. API contracts, JOSE compliance strategy, and P1–P4 integration boundaries defined.</div>
+          <div class="tl-badge tag-green">✓ Completed</div>
+        </div>
+        <div class="tl-item done">
+          <div class="tl-dot"></div>
+          <div class="tl-date">Apr – May 2025</div>
+          <div class="tl-title">P1 Implementation &amp; Integration</div>
+          <div class="tl-desc">ML-DSA-44 signing service built with FastAPI, pqcrypto, Docker, and Prometheus. Full sweep integration with P2, P3, P4 validated.</div>
+          <div class="tl-badge tag-green">✓ Completed</div>
+        </div>
+        <div class="tl-item done">
+          <div class="tl-dot"></div>
+          <div class="tl-date">May 2025</div>
+          <div class="tl-title">Progress Presentation 1</div>
+          <div class="tl-desc">First formal review presented to the academic panel. Benchmark methodology, integration sweep results, and individual component demonstrations.</div>
+          <div class="tl-badge tag-green">✓ Completed</div>
+        </div>
+        <div class="tl-item done">
+          <div class="tl-dot"></div>
+          <div class="tl-date">Jun 2025</div>
+          <div class="tl-title">Research Paper — CCAI 2026</div>
+          <div class="tl-desc">Group research paper submitted to CCAI 2026. Blind peer review completed with all revisions addressed in the second review cycle.</div>
+          <div class="tl-badge tag-blue">Under Review</div>
+        </div>
+        <div class="tl-item current">
+          <div class="tl-dot"></div>
+          <div class="tl-date">Sep 2025</div>
+          <div class="tl-title">Progress Presentation 2</div>
+          <div class="tl-desc">Second formal progress review with final benchmark results, integration sweep v3, and individual thesis documentation status.</div>
+          <div class="tl-badge tag-green">▶ In Progress</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-date">Oct 2025</div>
+          <div class="tl-title">Final Thesis Submission</div>
+          <div class="tl-desc">Individual dissertations submitted to the SLIIT examination panel with full system documentation and evaluation evidence.</div>
+          <div class="tl-badge" style="background:#F6F8FA;color:#57606A;">⏳ Upcoming</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-date">Dec 2025</div>
+          <div class="tl-title">Final Viva &amp; Presentation</div>
+          <div class="tl-desc">Final oral examination and research presentation to the external examination panel. Project conclusion.</div>
+          <div class="tl-badge" style="background:#F6F8FA;color:#57606A;">⏳ Upcoming</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- DOCUMENTS -->
+<section id="documents" class="section">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-label">Documents</div>
+      <h2 class="sec-title">Project Resources</h2>
+      <p class="sec-sub">Group research artefacts, source code, presentations, and academic documents. Links will be activated as each document is published.</p>
+    </div>
+    <div class="docs-grid reveal">
+      <a href="#" class="doc-row">
+        <div class="doc-icon pdf">📄</div>
+        <div class="doc-info">
+          <div class="doc-name">Research Paper</div>
+          <div class="doc-meta">CCAI 2026 Conference</div>
+        </div>
+        <div class="doc-status status-soon">Coming Soon</div>
+      </a>
+      <a href="https://github.com/Cyber-Research-Quitty/Quitty" target="_blank" class="doc-row">
+        <div class="doc-icon code">⌥</div>
+        <div class="doc-info">
+          <div class="doc-name">Project Source Code</div>
+          <div class="doc-meta">GitHub · Cyber-Research-Quitty</div>
+        </div>
+        <div class="doc-status status-link">GitHub ↗</div>
+      </a>
+      <a href="#" class="doc-row">
+        <div class="doc-icon pdf">📋</div>
+        <div class="doc-info">
+          <div class="doc-name">Project Proposals</div>
+          <div class="doc-meta">Group &amp; Individual · Version 2</div>
+        </div>
+        <div class="doc-status status-soon">Coming Soon</div>
+      </a>
+      <a href="#" class="doc-row">
+        <div class="doc-icon pdf">🎓</div>
+        <div class="doc-info">
+          <div class="doc-name">Individual Theses</div>
+          <div class="doc-meta">P1 · P2 · P3 · P4</div>
+        </div>
+        <div class="doc-status status-soon">Coming Soon</div>
+      </a>
+      <a href="#" class="doc-row">
+        <div class="doc-icon slides">📊</div>
+        <div class="doc-info">
+          <div class="doc-name">Proposal Presentation</div>
+          <div class="doc-meta">Group Slides</div>
+        </div>
+        <div class="doc-status status-soon">Coming Soon</div>
+      </a>
+      <a href="#" class="doc-row">
+        <div class="doc-icon slides">📊</div>
+        <div class="doc-info">
+          <div class="doc-name">Progress Presentations</div>
+          <div class="doc-meta">PP1 · PP2 · Final</div>
+        </div>
+        <div class="doc-status status-soon">Coming Soon</div>
+      </a>
+      <a href="#" class="doc-row">
+        <div class="doc-icon link">🔗</div>
+        <div class="doc-info">
+          <div class="doc-name">TAF Document</div>
+          <div class="doc-meta">Project 25-26J-048 Registration</div>
+        </div>
+        <div class="doc-status status-soon">Coming Soon</div>
+      </a>
+      <a href="#" class="doc-row">
+        <div class="doc-icon pdf">📝</div>
+        <div class="doc-info">
+          <div class="doc-name">Research Logbook</div>
+          <div class="doc-meta">Group Weekly Progress Records</div>
+        </div>
+        <div class="doc-status status-soon">Coming Soon</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK (dark) -->
+<section class="section section-dark">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-label" style="color:#58A6FF">
+        <span style="background:#58A6FF;height:1px;width:20px;display:inline-block;vertical-align:middle;margin-right:8px"></span>
+        Stack
+      </div>
+      <h2 class="sec-title" style="color:#E6EDF3">Technologies Used</h2>
+      <p class="sec-sub" style="color:#8B949E">The P1 service is built on a Python microservice stack with NIST-standardised post-quantum cryptography.</p>
+    </div>
+    <div class="tech-grid reveal">
+      <div class="tech-card">
+        <div class="tech-card-name">Python 3.13</div>
+        <div class="tech-card-desc">Runtime · Docker base image python:3.13-slim</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-card-name">FastAPI 0.115</div>
+        <div class="tech-card-desc">ASGI web framework · async REST endpoints</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-card-name">pqcrypto 0.3.4</div>
+        <div class="tech-card-desc">ML-DSA-44 keygen, sign, verify operations</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-card-name">ML-DSA-44</div>
+        <div class="tech-card-desc">CRYSTALS-Dilithium · NIST FIPS 204 · Cat. 2</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-card-name">Pydantic 2.9</div>
+        <div class="tech-card-desc">Request validation · Settings management</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-card-name">Docker</div>
+        <div class="tech-card-desc">Containerised deployment · docker-compose</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-card-name">Prometheus</div>
+        <div class="tech-card-desc">5 custom metrics · /metrics scrape endpoint</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-card-name">JOSE / JWS</div>
+        <div class="tech-card-desc">RFC 7515 compact serialisation · JWKS export</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="background:rgba(255,255,255,.06)"></div>
+
+<!-- DOMAIN -->
+<section id="domain" class="section section-dark">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-label" style="color:#58A6FF">
+        <span style="background:#58A6FF;height:1px;width:20px;display:inline-block;vertical-align:middle;margin-right:8px"></span>
+        Domain
+      </div>
+      <h2 class="sec-title" style="color:#E6EDF3">Research Domain</h2>
+      <p class="sec-sub" style="color:#8B949E">The problem space, identified research gaps, and scientific contributions of this work.</p>
+    </div>
+    <div class="domain-grid reveal">
+      <div class="domain-card" style="background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)">
+        <div class="domain-num" style="color:#58A6FF">01 · Research Gap</div>
+        <h3 style="color:#E6EDF3">Missing Production PQC JWT</h3>
+        <p style="color:#8B949E">No major identity provider (Auth0, Keycloak) supports ML-DSA natively. Prior work lacks JOSE compliance, key management, and tail-latency benchmarking at system level.</p>
+      </div>
+      <div class="domain-card" style="background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)">
+        <div class="domain-num" style="color:#58A6FF">02 · Research Problem</div>
+        <h3 style="color:#E6EDF3">Quantum Threat to JWT Auth</h3>
+        <p style="color:#8B949E">RS256 and ES256 are broken by Shor's algorithm. The "harvest now, decrypt later" strategy motivates migration to post-quantum algorithms before quantum computers become available.</p>
+      </div>
+      <div class="domain-card" style="background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)">
+        <div class="domain-num" style="color:#58A6FF">03 · Methodology</div>
+        <h3 style="color:#E6EDF3">Design, Build, Evaluate</h3>
+        <p style="color:#8B949E">Implement the P1 signing service, integrate with three companion components, and benchmark against an RS256 baseline capturing average, p95, p99 latency and zero-failure stability.</p>
+      </div>
+      <div class="domain-card" style="background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)">
+        <div class="domain-num" style="color:#3FB950">04 · Contribution</div>
+        <h3 style="color:#E6EDF3">JOSE-Compatible ML-DSA Service</h3>
+        <p style="color:#8B949E">First production-oriented, Dockerised ML-DSA-44 JWT signing and verification service with deterministic key identifiers, multi-active key management, and Prometheus observability.</p>
+      </div>
+      <div class="domain-card" style="background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)">
+        <div class="domain-num" style="color:#3FB950">05 · Literature</div>
+        <h3 style="color:#E6EDF3">Built on NIST PQC Foundations</h3>
+        <p style="color:#8B949E">Grounded in NIST FIPS 204, RFC 7515–7519, and feasibility studies by Alkhulaifi &amp; El-Alfy (2020) and Dhanush &amp; Jain (2023). Advances prior art from benchmarks to a complete integration architecture.</p>
+      </div>
+      <div class="domain-card" style="background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)">
+        <div class="domain-num" style="color:#3FB950">06 · Impact</div>
+        <h3 style="color:#E6EDF3">Quantum-Ready Before 2030</h3>
+        <p style="color:#8B949E">Demonstrates organisations can migrate JWT authentication to post-quantum cryptography today within existing microservice architectures — ahead of NIST's 2030 migration deadline.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="footer-brand">pqc-jwt-framework · 25-26J-048</div>
+      <div class="footer-meta">
+        Secure Enhanced JWT Framework with Post-Quantum Cryptography<br/>
+        Department of Computer Systems Engineering · SLIIT · 2025/2026
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href="#abstract">Abstract</a>
+      <a href="#results">Results</a>
+      <a href="#team">Team</a>
+      <a href="#milestones">Milestones</a>
+      <a href="#documents">Documents</a>
+      <a href="https://github.com/Cyber-Research-Quitty/Quitty" target="_blank">GitHub ↗</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('in'), i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
